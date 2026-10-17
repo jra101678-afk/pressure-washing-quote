@@ -273,10 +273,26 @@ $("quoteForm").addEventListener("submit", async e=>{
 
   const btn = $("submitBtn"); btn.disabled = true; btn.textContent = "Sending…"; showMsg("","");
   try{
-    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({service_id:EMAILJS.serviceId, template_id:EMAILJS.templateId, user_id:EMAILJS.publicKey, template_params:params})
-    });
+    let res;
+    if (!EMAILJS.publicKey.startsWith("YOUR_")) {
+      res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({service_id:EMAILJS.serviceId, template_id:EMAILJS.templateId, user_id:EMAILJS.publicKey, template_params:params})
+      });
+    } else {
+      // No-account email relay (FormSubmit) sends straight to SEND_TO
+      res = await fetch("https://formsubmit.co/ajax/" + SEND_TO, {
+        method:"POST", headers:{"Content-Type":"application/json","Accept":"application/json"},
+        body: JSON.stringify({
+          _subject: `New pressure washing quote: ${c.name} - ${money(q.total)}`,
+          _template: "table", _captcha: "false", _replyto: c.email,
+          "Customer name": c.name, "Customer email": c.email, "Phone": c.phone,
+          "Property address": c.address, "Services": params.services,
+          "Quote breakdown": breakdown, "Quote total": money(q.total),
+          "Notes": params.notes, "Submitted": params.submitted_at
+        })
+      });
+    }
     if (!res.ok) throw new Error(await res.text());
     $("rName").textContent = c.name.split(" ")[0];
     $("rTotal").textContent = money(q.total);
