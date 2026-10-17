@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instant Pressure Washing Quote</title>
+<style>
+  :root{--bg:#f3f6f9;--card:#fff;--ink:#14202b;--muted:#5b6b7a;--line:#dbe3ea;--brand:#0b6fb8;--brand-ink:#fff;--ok:#1d7a46;--err:#b42318;--soft:#e8f2fb}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{background:var(--brand);color:var(--brand-ink);padding:28px 16px}
+  header div,main{max-width:760px;margin:0 auto}
+  header h1{margin:0 0 4px;font-size:1.6rem}
+  header p{margin:0;opacity:.9}
+  main{padding:20px 16px 48px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+  h2{font-size:1.1rem;margin:0 0 12px}
+  label{display:block;font-weight:600;font-size:.92rem;margin:0 0 4px}
+  input,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+  input:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .full{grid-column:1/-1}
+  .svc{display:grid;grid-template-columns:auto 1fr 150px;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+  .svc:first-of-type{border-top:0}
+  .svc input[type=checkbox]{width:20px;height:20px;accent-color:var(--brand)}
+  .svc .name{font-weight:600}
+  .svc .rate{display:block;font-size:.85rem;color:var(--muted);font-weight:400}
+  .svc input[type=number]:disabled{background:#f1f4f7;color:#9aa8b5}
+  .hint{font-size:.85rem;color:var(--muted);margin:8px 0 0}
+  table{width:100%;border-collapse:collapse}
+  td{padding:6px 0}
+  td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+  .total td{font-size:1.4rem;font-weight:700;border-top:2px solid var(--ink);padding-top:10px}
+  .min-note{background:var(--soft);border-radius:8px;padding:8px 12px;font-size:.9rem;margin-top:10px}
+  button{width:100%;padding:14px;border:0;border-radius:10px;background:var(--brand);color:var(--brand-ink);font:600 1.05rem/1 inherit;font-family:inherit;cursor:pointer}
+  button:disabled{opacity:.6;cursor:wait}
+  .msg{margin-top:12px;padding:12px;border-radius:8px;display:none}
+  .msg.ok{display:block;background:#e7f6ed;color:var(--ok)}
+  .msg.err{display:block;background:#fdecea;color:var(--err)}
+  .err-text{color:var(--err);font-size:.85rem;margin-top:4px;display:none}
+  .result{display:none;text-align:center}
+  .result .big{font-size:2.6rem;font-weight:800;color:var(--brand);margin:6px 0}
+  @media (max-width:560px){.grid{grid-template-columns:1fr}.svc{grid-template-columns:auto 1fr}.svc input[type=number]{grid-column:2}}
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Instant Pressure Washing Quote</h1>
+  <p>Tell us about your property and get your price on the spot.</p>
+</div></header>
+
+<main>
+<form id="quoteForm" novalidate>
+  <section class="card">
+    <h2>1. What do you need cleaned?</h2>
+    <div class="svc">
+      <input type="checkbox" id="c_house" data-svc="house">
+      <label for="c_house" class="name">House exterior <span class="rate">$0.15 per sq ft</span></label>
+      <input type="number" id="q_house" min="1" step="1" placeholder="Sq ft" disabled aria-label="House square feet">
+    </div>
+    <div class="svc">
+      <input type="checkbox" id="c_driveway" data-svc="driveway">
+      <label for="c_driveway" class="name">Driveway <span class="rate">$0.12 per sq ft</span></label>
+      <input type="number" id="q_driveway" min="1" step="1" placeholder="Sq ft" disabled aria-label="Driveway square feet">
+    </div>
+    <div class="svc">
+      <input type="checkbox" id="c_deck" data-svc="deck">
+      <label for="c_deck" class="name">Deck <span class="rate">$0.30 per sq ft</span></label>
+      <input type="number" id="q_deck" min="1" step="1" placeholder="Sq ft" disabled aria-label="Deck square feet">
+    </div>
+    <div class="svc">
+      <input type="checkbox" id="c_fence" data-svc="fence">
+      <label for="c_fence" class="name">Fence <span class="rate">$1.00 per linear ft</span></label>
+      <input type="number" id="q_fence" min="1" step="1" placeholder="Linear ft" disabled aria-label="Fence linear feet">
+    </div>
+    <p class="hint">Not sure of the size? Length × width gives square feet (e.g. a 20 ft × 40 ft driveway = 800 sq ft). Minimum job is $150.</p>
+    <div class="err-text" id="svcErr">Please choose at least one service and enter its size.</div>
+  </section>
+
+  <section class="card">
+    <h2>2. Your details</h2>
+    <div class="grid">
+      <div><label for="name">Full name *</label><input id="name" autocomplete="name" required></div>
+      <div><label for="phone">Phone *</label><input id="phone" type="tel" autocomplete="tel" required></div>
+      <div class="full"><label for="email">Email *</label><input id="email" type="email" autocomplete="email" required></div>
+      <div class="full"><label for="address">Property address *</label><input id="address" autocomplete="street-address" required></div>
+      <div class="full"><label for="notes">Anything else we should know? (optional)</label><textarea id="notes" rows="3" placeholder="Stains, preferred dates, access instructions…"></textarea></div>
+    </div>
+    <div class="err-text" id="detailErr">Please fill in your name, phone, a valid email and the property address.</div>
+  </section>
+
+  <section class="card">
+    <h2>3. Your price</h2>
+    <table><tbody id="lines"><tr><td colspan="2" style="color:var(--muted)">Choose a service above to see your price.</td></tr></tbody>
+      <tfoot><tr class="total"><td>Total</td><td id="total">$0.00</td></tr></tfoot></table>
+    <div class="min-note" id="minNote" style="display:none"></div>
+    <div style="margin-top:16px"><button type="submit" id="submitBtn">Get my quote</button></div>
+    <div class="msg" id="msg" role="status"></div>
+  </section>
+</form>
+
+<section class="card result" id="result">
+  <h2>Thanks, <span id="rName"></span>! Your quote is</h2>
+  <div class="big" id="rTotal"></div>
+  <table><tbody id="rLines"></tbody></table>
+  <p class="hint" id="rNote"></p>
+  <p>We've received your request and will be in touch shortly to schedule.</p>
+  <button type="button" id="newQuote">Start a new quote</button>
+</section>
+</main>
+
+<script>
+/* ===== EMAIL SETTINGS (EmailJS – https://www.emailjs.com) =====
+   Fill in the three values from your EmailJS dashboard. */
+const EMAILJS = {
+  serviceId:  "YOUR_SERVICE_ID",
+  templateId: "YOUR_TEMPLATE_ID",
+  publicKey:  "YOUR_PUBLIC_KEY"
+};
+const SEND_TO = "careers@finchharbor.com";
+
+/* ===== PRICING ===== */
+const PRICES = {
+  house:    {label:"House exterior", rate:0.15, unit:"sq ft"},
+  driveway: {label:"Driveway",       rate:0.12, unit:"sq ft"},
+  deck:     {label:"Deck",           rate:0.30, unit:"sq ft"},
+  fence:    {label:"Fence",          rate:1.00, unit:"linear ft"}
+};
+const MINIMUM = 150;
+
+const $ = id => document.getElementById(id);
+const money = n => "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function calculate(){
+  const lines = [];
+  for (const key in PRICES){
+    if (!$("c_"+key).checked) continue;
+    const qty = parseFloat($("q_"+key).value);
+    if (!(qty > 0)) continue;
+    const p = PRICES[key];
+    lines.push({key, label:p.label, qty, unit:p.unit, rate:p.rate, amount:Math.round(qty*p.rate*100)/100});
+  }
+  const subtotal = Math.round(lines.reduce((s,l)=>s+l.amount,0)*100)/100;
+  const total = lines.length ? Math.max(subtotal, MINIMUM) : 0;
+  return {lines, subtotal, total, minApplied: lines.length>0 && subtotal < MINIMUM};
+}
+
+function render(){
+  const q = calculate();
+  $("lines").innerHTML = q.lines.length
+    ? q.lines.map(l=>`<tr><td>${l.label} — ${l.qty.toLocaleString()} ${l.unit} × ${money(l.rate)}</td><td>${money(l.amount)}</td></tr>`).join("")
+    : `<tr><td colspan="2" style="color:var(--muted)">Choose a service above to see your price.</td></tr>`;
+  $("total").textContent = money(q.total);
+  const mn = $("minNote");
+  if (q.minApplied){ mn.style.display="block"; mn.textContent = `Your services add up to ${money(q.subtotal)}. Our minimum job is ${money(MINIMUM)}, so your price is ${money(MINIMUM)}.`; }
+  else mn.style.display="none";
+  return q;
+}
+
+for (const key in PRICES){
+  $("c_"+key).addEventListener("change", e=>{
+    const inp = $("q_"+key); inp.disabled = !e.target.checked;
+    if (e.target.checked) inp.focus(); render();
+  });
+  $("q_"+key).addEventListener("input", render);
+}
+
+function validate(q){
+  let ok = true;
+  const anyChecked = Object.keys(PRICES).some(k=>$("c_"+k).checked);
+  const badQty = Object.keys(PRICES).some(k=>$("c_"+k).checked && !(parseFloat($("q_"+k).value)>0));
+  $("svcErr").style.display = (!anyChecked || badQty || !q.lines.length) ? "block" : "none";
+  if (!anyChecked || badQty || !q.lines.length) ok = false;
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("email").value.trim());
+  const detailsOk = $("name").value.trim() && $("phone").value.trim() && $("address").value.trim() && emailOk;
+  $("detailErr").style.display = detailsOk ? "none" : "block";
+  return ok && !!detailsOk;
+}
+
+function showMsg(type, text){ const m=$("msg"); m.className="msg "+type; m.textContent=text; }
+
+$("quoteForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const q = render();
+  if (!validate(q)){ showMsg("err","Please fix the highlighted items above."); return; }
+
+  const c = {name:$("name").value.trim(), email:$("email").value.trim(), phone:$("phone").value.trim(), address:$("address").value.trim(), notes:$("notes").value.trim()};
+  const breakdown = q.lines.map(l=>`${l.label}: ${l.qty.toLocaleString()} ${l.unit} x ${money(l.rate)} = ${money(l.amount)}`).join("\n")
+    + `\nSubtotal: ${money(q.subtotal)}` + (q.minApplied ? `\nMinimum job of ${money(MINIMUM)} applied` : "")
+    + `\nTOTAL QUOTE: ${money(q.total)}`;
+
+  const params = {
+    to_email: SEND_TO,
+    customer_name: c.name, customer_email: c.email, customer_phone: c.phone,
+    property_address: c.address, notes: c.notes || "(none)",
+    services: q.lines.map(l=>l.label).join(", "),
+    quote_breakdown: breakdown, quote_total: money(q.total),
+    submitted_at: new Date().toLocaleString()
+  };
+
+  const btn = $("submitBtn"); btn.disabled = true; btn.textContent = "Sending…"; showMsg("","");
+  try{
+    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({service_id:EMAILJS.serviceId, template_id:EMAILJS.templateId, user_id:EMAILJS.publicKey, template_params:params})
+    });
+    if (!res.ok) throw new Error(await res.text());
+    $("rName").textContent = c.name.split(" ")[0];
+    $("rTotal").textContent = money(q.total);
+    $("rLines").innerHTML = $("lines").innerHTML;
+    $("rNote").textContent = q.minApplied ? `Includes our ${money(MINIMUM)} minimum job charge.` : "";
+    $("quoteForm").style.display = "none"; $("result").style.display = "block";
+    window.scrollTo({top:0,behavior:"smooth"});
+  }catch(err){
+    console.error(err);
+    showMsg("err", `Your price is ${money(q.total)}, but we couldn't send your request just now. Please try again in a moment.`);
+  }finally{ btn.disabled=false; btn.textContent="Get my quote"; }
+});
+
+$("newQuote").addEventListener("click", ()=>{
+  $("quoteForm").reset();
+  for (const k in PRICES) $("q_"+k).disabled = true;
+  render(); showMsg("","");
+  $("result").style.display="none"; $("quoteForm").style.display="block";
+});
+render();
+</script>
+</body>
+</html>
